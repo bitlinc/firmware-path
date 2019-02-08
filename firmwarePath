@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# install Homebrew 
+installHomeBrew () {
+    if [[ $(command -v brew) == "" ]]; then
+    echo "Installing Hombrew"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" -y
+else
+    echo "Updating Homebrew"
+    brew update
+fi
+}
+
+# install bootoption 
+installBootOption () {
+   brew tap vulgo/repo
+   
+    if [[ $(command -v bootoption ) == "" ]]; then
+    echo "Installing bootoption"
+    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer -y
+    else
+    echo "bootoption is already installed"
+    sleep 2.5
+    fi
+}
+
+
+# Display loader path:
+displayLoaderPath () {
+   echo "Here is your firmware boot menu"
+   bootoption list
+   sleep 1.
+   read -r -p "Please choose the option you want info on (enter ONLY the last two numbers AFTER Boot00) `echo $'\n '`" USEROPTION
+   echo ""
+   echo "Sending this info to a text doc on your desktop labled: MacFirmwareInfo.txt"
+   echo ""
+   sleep .15
+}
+
+# bootoption info on $USEROPTION
+bootOptionOnUserOption () {
+    echo "Here is the info on option BOOT00"$USEROPTION" boot menu"
+    bootoption info "$USEROPTION"
+    sleep .15
+}
+
+
+# Create Text doc with your firmware list
+createTextDoc () {
+   cd $Home
+   cd Desktop
+   touch MacFirmwareInfo.txt
+   INFO=$(bootoption info -v "$USEROPTION")
+   sudo echo $INFO >> /Users/test/Desktop/MacFirmwareInfo.txt
+   echo ""
+   }
+  
+  installHomeBrew
+  installBootOption
+  displayLoaderPath
+  bootOptionOnUserOption
+  createTextDoc 
